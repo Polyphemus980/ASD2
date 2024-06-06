@@ -42,6 +42,51 @@ namespace ASD2
             return true;
         }
         static int test=0;
+
+        public bool AllCompleted(bool[] completed)
+        {
+            for (int i = 0; i < completed.Length; i++)
+            {
+                if (completed[i] == false)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public (int,List<int>) FindBestVertex(bool[] completed,int[] colors,Graph g,int maxColors,List<int> skippedVertexes)
+        {
+            List<int> addedSkipped = new List<int>();
+            int index = 0;
+            int max=int.MaxValue;
+            int maxUncoloredNeighbors=-1;
+            for (int i = 0; i < colors.Length; i++)
+            {
+                if (completed[i])
+                    continue;
+                int notcoloredNeighbors = uncoloredNeighbors(g, i, colors);
+                int outNeighbors = g.OutNeighbors(i).Count();
+                if (maxColors - outNeighbors + notcoloredNeighbors > notcoloredNeighbors)
+                {
+                    skippedVertexes.Add(i);
+                    addedSkipped.Add(i);
+                    completed[i] = true;
+                    continue;
+                }
+                if (maxColors - outNeighbors + notcoloredNeighbors < max)
+                {
+                    index = i;
+                }
+                else if (maxColors - outNeighbors + notcoloredNeighbors == max)
+                {
+                    if (notcoloredNeighbors > maxUncoloredNeighbors)
+                    {
+                        index = i;
+                    }
+                }
+            }
+            return (index,addedSkipped);
+        }
         public (int, int[]) FindBestColoring(Graph g)
         {
             test++;
@@ -50,11 +95,12 @@ namespace ASD2
             int[] cols = new int[g.VertexCount];
             Array.Fill(cols,-1);
             int maxColorsYet=int.MaxValue;
-            void FindColoring(Graph graph, int[] colors, int maxColors,int v,List<int> skippedVertices,bool[] completed)
+            void FindColoring(Graph graph, int[] colors, int maxColors,List<int> skippedVertices,bool[] completed)
             {
                 if (maxColorsYet <= maxColors)
                     return;
-                if (v == vertexCount && skippedVertices.Count==0)
+                bool all = AllCompleted(completed);
+                if (all && skippedVertices.Count==0)
                 {
                     if (maxColorsYet > maxColors)
                     { 
@@ -63,7 +109,7 @@ namespace ASD2
                     }
                     return;
                 }
-                if (v == vertexCount)
+                if (all)
                 {
                     foreach (int vertex in skippedVertices)
                     {
@@ -83,22 +129,23 @@ namespace ASD2
                         return;
                     }
                 }
-
+                
                 int counter = 0;
+                (int v,List<int> addedSkipped) = FindBestVertex(completed,colors,graph,maxColors,skippedVertices);
                 for (int i = 0; i < maxColors; i++)
                 {
-                    int uncoloredNeighbors = this.uncoloredNeighbors(graph, v, colors);
-                    if (maxColors-graph.OutNeighbors(v).Count()+uncoloredNeighbors > uncoloredNeighbors)
-                    {
-                        skippedVertices.Add(v);
-                        FindColoring(graph,colors,maxColors,v+1,skippedVertices,completed);
-                        break;
-                    } 
                     if (CanColor(graph, v, i, colors))
                     {
+                        completed[v] = true;
                         colors[v] = i;
-                        FindColoring(graph,colors,maxColors,v+1,skippedVertices,completed);
+                        FindColoring(graph,colors,maxColors,skippedVertices,completed);
                         colors[v] = -1;
+                        foreach (var s in addedSkipped)
+                        {
+                            skippedVertices.Remove(s);
+                            completed[s] = false;
+                        }
+                        completed[v] = false;
                     }
                     else
                         counter++;
@@ -109,14 +156,21 @@ namespace ASD2
                     int m = maxColors;
                     while (m < maxColorsYet)
                     {
+                        completed[v] = true;
                         colors[v] = m;
-                        FindColoring(graph, colors, m + 1, v + 1,skippedVertices,completed);
+                        FindColoring(graph, colors, m + 1,skippedVertices,completed);
                         colors[v] = -1;
+                        foreach (var s in addedSkipped)
+                        {
+                            skippedVertices.Remove(s);
+                            completed[s] = false;
+                        }
+                        completed[v] = false;
                         m++;
                     }
                 }
             }
-            FindColoring(g, cols,1,0,new List<int>(),new bool[vertexCount]);
+            FindColoring(g, cols,1,new List<int>(),new bool[vertexCount]);
 
             return (maxColorsYet, bestColors);
         }

@@ -222,11 +222,11 @@ namespace ASD2
                     G.AddEdge(i, (i + 1) % (2 * n + 1));
                 tests.TestCases.Add(new GraphColoringTestCase(G, 3, 2, "Duży nieparzysty cykl"));
             }
-            // {
-            //     RandomGraphGenerator rgg = new RandomGraphGenerator(123);
-            //     Graph G = rgg.Graph(54, 0.2);
-            //     tests.TestCases.Add(new GraphColoringTestCase(G, 5, 4, "Graf losowy 1"));
-            // }
+            {
+                RandomGraphGenerator rgg = new RandomGraphGenerator(123);
+                Graph G = rgg.Graph(54, 0.2);
+                tests.TestCases.Add(new GraphColoringTestCase(G, 5, 4, "Graf losowy 1"));
+            }
             {
                 RandomGraphGenerator rgg = new RandomGraphGenerator(124);
                 Graph G = rgg.Graph(32, 0.4);
