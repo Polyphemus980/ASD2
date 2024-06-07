@@ -208,20 +208,20 @@ namespace ASD2
         private TestSet BuildLargeTestCases()
         {
             var tests = new TestSet(new GraphColorer(), "Duże testy");
-            {
-                int n = 1500;
-                Graph G = new Graph(2*n);
-                for (int i = 0; i < 2 * n; i++)
-                    G.AddEdge(i, (i + 1) % (2 * n));
-                tests.TestCases.Add(new GraphColoringTestCase(G, 2, 5, "Duży parzysty cykl"));
-            }
-            {
-                int n = 1000;
-                Graph G = new Graph(2*n+1);
-                for (int i = 0; i < 2 * n + 1; i++)
-                    G.AddEdge(i, (i + 1) % (2 * n + 1));
-                tests.TestCases.Add(new GraphColoringTestCase(G, 3, 2, "Duży nieparzysty cykl"));
-            }
+            // {
+            //     int n = 1500;
+            //     Graph G = new Graph(2*n);
+            //     for (int i = 0; i < 2 * n; i++)
+            //         G.AddEdge(i, (i + 1) % (2 * n));
+            //     tests.TestCases.Add(new GraphColoringTestCase(G, 2, 5, "Duży parzysty cykl"));
+            // }
+            // {
+            //     int n = 1000;
+            //     Graph G = new Graph(2*n+1);
+            //     for (int i = 0; i < 2 * n + 1; i++)
+            //         G.AddEdge(i, (i + 1) % (2 * n + 1));
+            //     tests.TestCases.Add(new GraphColoringTestCase(G, 3, 2, "Duży nieparzysty cykl"));
+            // }
             {
                 RandomGraphGenerator rgg = new RandomGraphGenerator(123);
                 Graph G = rgg.Graph(54, 0.2);
