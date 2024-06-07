@@ -54,7 +54,7 @@ namespace ASD2
             return true;
         }
 
-        public (int,List<int>) FindBestVertex(bool[] completed,int[] colors,Graph g,int maxColors,List<int> skippedVertexes)
+        public (int,List<int>) FindBestVertex(bool[] completed,int[] colors,Graph g,int maxColors,List<int> skippedVertexes,int[] uncNeighbors)
         {
             List<int> addedSkipped = new List<int>();
             int index = 0;
@@ -64,9 +64,10 @@ namespace ASD2
             {
                 if (completed[i])
                     continue;
-                int notcoloredNeighbors = uncoloredNeighbors(g, i, colors);
+                int notcoloredNeighbors = uncNeighbors[i];//uncoloredNeighbors(g, i, colors);
                 int outNeighbors = g.Degree(i);
-                if (maxColors - outNeighbors + notcoloredNeighbors > notcoloredNeighbors && !completed[i])
+                int coloredNeighbors = outNeighbors - notcoloredNeighbors;
+                if (maxColors - coloredNeighbors > notcoloredNeighbors && !completed[i])     
                 {
                     skippedVertexes.Add(i);
                     addedSkipped.Add(i);
@@ -128,14 +129,18 @@ namespace ASD2
                 }
                 
                 int counter = 0;
-                (int v,List<int> addedSkipped) = FindBestVertex(completed,colors,graph,maxColors,skippedVertices);
+                (int v,List<int> addedSkipped) = FindBestVertex(completed,colors,graph,maxColors,skippedVertices,uncoloredNeighbors);
+                foreach (int neighbor in g.OutNeighbors(v))
+                {
+                    uncoloredNeighbors[neighbor]--;
+                }
                 for (int i = 0; i < maxColors; i++)
                 {
                     if (CanColor(graph, v, i, colors))
                     {
                         completed[v] = true;
                         colors[v] = i;
-                        FindColoring(graph,colors,maxColors,skippedVertices,completed);
+                        FindColoring(graph,colors,maxColors,skippedVertices,completed,uncoloredNeighbors);
                         colors[v] = -1;
                         completed[v] = false;
                     }
@@ -150,11 +155,15 @@ namespace ASD2
                     {
                         completed[v] = true;
                         colors[v] = m;
-                        FindColoring(graph, colors, m + 1,skippedVertices);
+                        FindColoring(graph, colors, m + 1,skippedVertices,completed,uncoloredNeighbors);
                         colors[v] = -1;
                         completed[v] = false;
                         m++;
                     }
+                }
+                foreach (int neighbor in g.OutNeighbors(v))
+                {
+                    uncoloredNeighbors[neighbor]++;
                 }
                 foreach (var s in addedSkipped)
                 {
@@ -169,7 +178,6 @@ namespace ASD2
                 uncNeighbors[i] = g.Degree(i);
             }
             FindColoring(g, cols,1,new List<int>(),new bool[vertexCount],uncNeighbors);
-
             return (maxColorsYet, bestColors);
         }
 
