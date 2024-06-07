@@ -41,7 +41,24 @@ namespace ASD2
             }
             return true;
         }
-        static int test=0;
+
+        private int[] AvailableColors(Graph g, int v, int[] colors,int MaxColors)
+        {
+            HashSet<int> set = new HashSet<int>();
+            for (int i = 0; i < MaxColors; i++)
+            {
+                set.Add(i);
+            }
+
+            foreach (int neighbor in g.OutNeighbors(v))
+            {
+                if (colors[neighbor] != -1)
+                    set.Remove(colors[neighbor]);
+            }
+
+            List<int> t = new List<int>(set);
+            return t.ToArray();
+        }
 
         public bool AllCompleted(bool[] completed)
         {
@@ -64,23 +81,24 @@ namespace ASD2
             {
                 if (completed[i])
                     continue;
-                int notcoloredNeighbors = uncNeighbors[i];//uncoloredNeighbors(g, i, colors);
+                int notcoloredNeighbors = uncNeighbors[i];
                 int outNeighbors = g.Degree(i);
                 int coloredNeighbors = outNeighbors - notcoloredNeighbors;
-                if (maxColors - coloredNeighbors > notcoloredNeighbors && !completed[i])     
+                int availableColors = maxColors - coloredNeighbors;
+                if (availableColors > notcoloredNeighbors && !completed[i])     
                 {
                     skippedVertexes.Add(i);
                     addedSkipped.Add(i);
                     completed[i] = true;
                     continue;
                 }
-                if (maxColors - outNeighbors + notcoloredNeighbors < max)
+                if (availableColors < max)
                 {
                     max = maxColors - outNeighbors + notcoloredNeighbors;
                     index = i;
                     maxUncoloredNeighbors = notcoloredNeighbors;
                 }
-                else if (maxColors - outNeighbors + notcoloredNeighbors == max)
+                else if (availableColors == max)
                 {
                     if (notcoloredNeighbors > maxUncoloredNeighbors)
                     {
@@ -93,7 +111,6 @@ namespace ASD2
         }
         public (int, int[]) FindBestColoring(Graph g)
         {
-            test++;
             int vertexCount = g.VertexCount;
             int[] bestColors=new int[g.VertexCount];
             int[] cols = new int[g.VertexCount];
@@ -128,27 +145,38 @@ namespace ASD2
                     return;
                 }
                 
-                int counter = 0;
+                //int counter = 0;
                 (int v,List<int> addedSkipped) = FindBestVertex(completed,colors,graph,maxColors,skippedVertices,uncoloredNeighbors);
                 foreach (int neighbor in g.OutNeighbors(v))
                 {
                     uncoloredNeighbors[neighbor]--;
                 }
-                for (int i = 0; i < maxColors; i++)
+                // for (int i = 0; i < maxColors; i++)
+                // {
+                //     if (CanColor(graph, v, i, colors))
+                //     {
+                //         completed[v] = true;
+                //         colors[v] = i;
+                //         FindColoring(graph,colors,maxColors,skippedVertices,completed,uncoloredNeighbors);
+                //         colors[v] = -1;
+                //         completed[v] = false;
+                //     }
+                //     else
+                //         counter++;
+                // }
+                int[] availableColors = AvailableColors(g, v, colors, maxColors);
+                if (availableColors.Length != 0)
                 {
-                    if (CanColor(graph, v, i, colors))
+                    foreach (int color in availableColors)
                     {
                         completed[v] = true;
-                        colors[v] = i;
+                        colors[v] = color;
                         FindColoring(graph,colors,maxColors,skippedVertices,completed,uncoloredNeighbors);
                         colors[v] = -1;
                         completed[v] = false;
                     }
-                    else
-                        counter++;
                 }
-
-                if (counter == maxColors)
+                else
                 {
                     int m = maxColors;
                     while (m < maxColorsYet)
@@ -161,6 +189,19 @@ namespace ASD2
                         m++;
                     }
                 }
+                // if (counter == maxColors)
+                // {
+                //     int m = maxColors;
+                //     while (m < maxColorsYet)
+                //     {
+                //         completed[v] = true;
+                //         colors[v] = m;
+                //         FindColoring(graph, colors, m + 1,skippedVertices,completed,uncoloredNeighbors);
+                //         colors[v] = -1;
+                //         completed[v] = false;
+                //         m++;
+                //     }
+                // }
                 foreach (int neighbor in g.OutNeighbors(v))
                 {
                     uncoloredNeighbors[neighbor]++;
