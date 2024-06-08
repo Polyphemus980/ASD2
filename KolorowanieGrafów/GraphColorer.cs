@@ -150,18 +150,16 @@ namespace ASD2
                     return;
                 }
                 (int v,HashSet<int> addedSkipped) = FindBestVertex(completed,colors,graph,maxColors,skippedVertices,uncoloredNeighbors,vertexDegrees,avlColors);
-                IEnumerable<int> neighbors = g.OutNeighbors(v);
-                var enumerable = neighbors as int[] ?? neighbors.ToArray();
-                foreach (int neighbor in enumerable)
+                foreach (int neighbor in g.OutNeighbors(v))
                 {
                     uncoloredNeighbors[neighbor]--;
                 }
-                HashSet<int> availableColors = AvailableColors(g, v, colors, maxColors);
+                HashSet<int> canUseColors = AvailableColors(g, v, colors, maxColors);
                 completed[v] = true; 
-                foreach (int color in availableColors) 
+                foreach (int color in canUseColors) 
                 { 
                     colors[v] = color;
-                    foreach (int neighbor in enumerable)
+                    foreach (int neighbor in g.OutNeighbors(v))
                     {
                         neighborUsingColorsCount[neighbor, color]++;
                         if (neighborUsingColorsCount[neighbor, color] == 1)
@@ -170,7 +168,7 @@ namespace ASD2
                         }
                     }
                     FindColoring(graph,colors,maxColors,skippedVertices,completed,uncoloredNeighbors,avlColors,neighborUsingColorsCount);
-                    foreach (int neighbor in enumerable)
+                    foreach (int neighbor in g.OutNeighbors(v))
                     {
                         neighborUsingColorsCount[neighbor, color]--;
                         if (neighborUsingColorsCount[neighbor, color] == 0)
@@ -185,7 +183,7 @@ namespace ASD2
                 {
                     avlColors[i]++;
                 }
-                foreach (int neighbor in enumerable)
+                foreach (int neighbor in g.OutNeighbors(v))
                 {
                     neighborUsingColorsCount[neighbor, maxColors]++;
                     if (neighborUsingColorsCount[neighbor, maxColors] == 1)
@@ -194,7 +192,7 @@ namespace ASD2
                     }
                 }
                 FindColoring(graph,colors,maxColors+1,skippedVertices,completed,uncoloredNeighbors,avlColors,neighborUsingColorsCount);
-                foreach (int neighbor in enumerable)
+                foreach (int neighbor in g.OutNeighbors(v))
                 {
                     neighborUsingColorsCount[neighbor, maxColors]--;
                     if (neighborUsingColorsCount[neighbor, maxColors] == 0)
