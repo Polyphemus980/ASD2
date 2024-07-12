@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KolorowanieGrafów")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+991452d21ccb18d90637873bafd4aa4563cd0e59")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e1ccacedac35df4b0b55e49a8e6ee97d670b32bf")]
 [assembly: System.Reflection.AssemblyProductAttribute("KolorowanieGrafów")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KolorowanieGrafów")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

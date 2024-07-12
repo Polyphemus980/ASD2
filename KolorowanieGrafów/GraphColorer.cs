@@ -20,18 +20,6 @@ namespace ASD2
             }
             Console.WriteLine();
         }
-
-        private int uncoloredNeighbors(Graph g, int vertex,int[] colors)
-        {
-            int counter = 0;
-            foreach (int neighbor in g.OutNeighbors(vertex))
-            {
-                if (colors[neighbor] == -1)
-                    counter++;
-            }
-
-            return counter;
-        }
         private bool CanColor(Graph g, int v,int color,int[] colors)
         {
             foreach (int neighbor in g.OutNeighbors(v))
